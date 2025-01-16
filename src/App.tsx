@@ -2,6 +2,7 @@ import "./App.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Layout from "./root/layout";
 import { Account, Bugdet, Dashabord, Report, Setting } from "./pages";
+import AccountDetail from "./pages/AccountDetail";
 
 const router = createBrowserRouter([
   {
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
       {
         path: "settings",
         element: <Setting />,
+      },
+      {
+        path: "account/:id",
+        element: <AccountDetail />,
       },
     ],
   },
