@@ -58,9 +58,9 @@ function SideBar() {
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <h1 className="text-xl font-sans font-medium text-center py-4">
+        <h1 className="text-xl tracking-widest font-mono text-green-500 font-medium text-center py-4">
           <span className="text-green-500">Le</span>
-          Wallet APP
+          Wallet
         </h1>
 
         <nav className="space-y-4">
