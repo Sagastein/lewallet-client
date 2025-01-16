@@ -1,11 +1,7 @@
 import "./App.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Layout from "./root/layout";
-import Dashabord from "./pages/Dashboard";
-import Account from "./pages/Account";
-import Bugdet from "./pages/Bugdet";
-import Report from "./pages/Report";
-import Setting from "./pages/Setting";
+import { Account, Bugdet, Dashabord, Report, Setting } from "./pages";
 
 const router = createBrowserRouter([
   {
