@@ -12,7 +12,7 @@ const ExpenseModal = ({ isOpen, onClose }) => {
   const tabs = ["Expense", "Income", "Transfer"];
 
   const renderTransferSection = () => (
-    <div className="bg-emerald-500 p-6 text-white">
+    <div className="bg-green-500 p-6 text-white">
       {/* Tabs */}
       <div className="flex bg-white rounded-md mb-6">
         {tabs.map((tab) => (
@@ -20,7 +20,7 @@ const ExpenseModal = ({ isOpen, onClose }) => {
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`flex-1 py-2 border border-white px-4 ${
-              activeTab === tab ? "bg-emerald-500 text-white" : "text-gray-600"
+              activeTab === tab ? "bg-green-500 text-white" : "text-gray-600"
             } first:rounded-l-md border border-white last:rounded-r-md`}
           >
             {tab}
@@ -223,7 +223,7 @@ const ExpenseModal = ({ isOpen, onClose }) => {
 
               {/* Action Buttons */}
               <div className="flex flex-col gap-2">
-                <button className="w-full bg-emerald-500 text-white py-2 rounded-md hover:bg-emerald-600">
+                <button className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600">
                   Add record
                 </button>
                 <button className="w-full text-blue-500 hover:text-blue-600">

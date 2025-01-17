@@ -12,10 +12,10 @@ import {
 } from "@material-tailwind/react";
 import { ArrowLeftIcon } from "lucide-react";
 import { BsCashCoin } from "react-icons/bs";
-
+import { useNavigate } from "react-router-dom";
 const AccountDetail = () => {
   const [activeTab, setActiveTab] = useState("records");
-
+  const navigate = useNavigate();
   const transactions = [
     {
       type: "Transfer, withdraw",
@@ -42,7 +42,11 @@ const AccountDetail = () => {
       {/* Header */}
       <div className="flex items-center justify-between p-4 bg-gray-50">
         <div className="flex items-center gap-4">
-          <IconButton variant="text" className="rounded-full">
+          <IconButton
+            onClick={() => navigate("/portal/accounts")}
+            variant="text"
+            className="rounded-full"
+          >
             <ArrowLeftIcon size={20} />
           </IconButton>
           <Typography variant="h6">Account Detail</Typography>

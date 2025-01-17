@@ -1,4 +1,3 @@
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import {
@@ -44,7 +43,7 @@ const FinancialDashboard = () => {
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       {/* Header with Date Range */}
-      <div className="flex flex-col md:flex-row justify-between items-center mb-6">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-2">
         <Typography variant="h3" className="mb-4 md:mb-0">
           Financial Dashboard
         </Typography>
@@ -53,6 +52,7 @@ const FinancialDashboard = () => {
             type="date"
             label="Start Date"
             value={dateRange.startDate}
+            containerProps={{ className: "bg-white rounded-md" }}
             onChange={(e) =>
               setDateRange((prev) => ({ ...prev, startDate: e.target.value }))
             }
@@ -61,6 +61,7 @@ const FinancialDashboard = () => {
           <Input
             type="date"
             label="End Date"
+            containerProps={{ className: "bg-white rounded-md" }}
             value={dateRange.endDate}
             onChange={(e) =>
               setDateRange((prev) => ({ ...prev, endDate: e.target.value }))
