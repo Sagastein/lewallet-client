@@ -41,6 +41,7 @@ function Budget() {
   };
 
   const handleEditBudget = (budget) => {
+    console.log(editingBudget);
     setEditingBudget(budget);
     setIsModalOpen(true);
   };

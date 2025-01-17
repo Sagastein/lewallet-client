@@ -50,13 +50,13 @@ function CreateBudgetModal({ isOpen, onClose, onCreate }) {
           />
         </div>
         <div className="mb-4">
-          <Select label="Type" value={type} onChange={(e) => setType(e.target.value)} className="w-full">
+          <Select label="Type" value={type} onChange={(value) => setType(value)} className="w-full">
             <Option value="expense">Expense</Option>
             <Option value="income">Income</Option>
           </Select>
         </div>
         <div className="mb-4">
-          <Select label="Budget For" value={budgetFor} onChange={(e) => setBudgetFor(e.target.value)} className="w-full">
+          <Select label="Budget For" value={budgetFor} onChange={(value) => setBudgetFor(value)} className="w-full">
             <Option value="all_expense">All Expense</Option>
             <Option value="all_income">All Income</Option>
             <Option value="other">Other Categories</Option>
