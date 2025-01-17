@@ -1,7 +1,8 @@
 import { useState } from "react";
 import AddAccountModal from "../components/AddaccountModal";
 import AccountList from "../components/AccountList";
-import { Typography } from "@material-tailwind/react";
+import { Typography, Button } from "@material-tailwind/react";
+
 const mockAccounts = [
   {
     id: 1,
@@ -28,29 +29,6 @@ const mockAccounts = [
     excludeFromStatistics: false,
   },
 ];
-// export const AccountList = ({ accounts }) => {
-//   return (
-//     <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-//       {accounts.map((account) => (
-//         <Card key={account.id} className="p-4">
-//           <Typography variant="h5" className="mb-2">
-//             {account.name}
-//           </Typography>
-//           <Typography variant="paragraph" className="mb-2">
-//             Type: {account.type}
-//           </Typography>
-//           <Typography variant="paragraph" className="mb-2">
-//             Initial Amount: {account.initialAmount} {account.currency}
-//           </Typography>
-//           <Typography variant="paragraph">
-//             Exclude from Statistics:{" "}
-//             {account.excludeFromStatistics ? "Yes" : "No"}
-//           </Typography>
-//         </Card>
-//       ))}
-//     </div>
-//   );
-// };
 
 function Account() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -59,17 +37,19 @@ function Account() {
   const closeModal = () => setIsModalOpen(false);
 
   return (
-    <main>
-      <div className="w-11/12 mx-auto flex justify-between items-center py-3">
-        <Typography variant="h3">Account</Typography>
-        <button
+    <main className="p-4 bg-gray-100 min-h-screen">
+      <div className="w-full max-w-6xl mx-auto flex justify-between items-center py-3">
+        <Typography variant="h3" className="text-3xl font-bold">
+          Accounts
+        </Typography>
+        <Button
           onClick={openModal}
-          className="bg-green-500 text-white px-4 py-2 rounded"
+          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
         >
           Add Account
-        </button>
+        </Button>
       </div>
-      <div className="p-2 bg-white w-11/12 mx-auto">
+      <div className="p-2 bg-white w-full max-w-6xl mx-auto rounded-lg shadow-md">
         <AccountList accounts={mockAccounts} />
       </div>
       <AddAccountModal isOpen={isModalOpen} onClose={closeModal} />
