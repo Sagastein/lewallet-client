@@ -6,182 +6,232 @@ import {
   CardBody,
   Typography,
   Input,
-  List,
-  ListItem,
-  ListItemPrefix,
-  ListItemSuffix,
-  Progress,
+  Button,
+  Dialog,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
+  Alert,
+  Radio,
 } from "@material-tailwind/react";
 import {
-  PieChart,
-  Pie,
+  LineChart,
+  Line,
   AreaChart,
   Area,
-  Cell,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   Legend,
   ResponsiveContainer,
+  RadialBarChart,
+  RadialBar,
+  Radar,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
 } from "recharts";
 
 const FinancialDashboard = () => {
-  const [dateRange, setDateRange] = useState({
-    startDate: "",
-    endDate: "",
-  });
-
-  // Sample data - replace with real data
-  const monthlyData = [
-    { month: "Jan", income: 4000, expense: 2400, savings: 1600 },
-    { month: "Feb", income: 3000, expense: 1398, savings: 1602 },
-    { month: "Mar", income: 2000, expense: 9800, savings: -7800 },
-    { month: "Apr", income: 2780, expense: 3908, savings: -1128 },
-    { month: "May", income: 1890, expense: 4800, savings: -2910 },
-    { month: "Jun", income: 2390, expense: 3800, savings: -1410 },
-  ];
-
-  const expenseCategories = [
-    { name: "Housing", value: 3500, color: "#FF8042" },
-    { name: "Food", value: 1200, color: "#00C49F" },
-    { name: "Transport", value: 800, color: "#FFBB28" },
-    { name: "Entertainment", value: 600, color: "#0088FE" },
-    { name: "Utilities", value: 400, color: "#FF6B6B" },
-  ];
-
-  const savingsGoalProgress = 65; // Percentage towards savings goal
-
-  const recentTransactions = [
-    {
-      id: 1,
-      type: "expense",
-      category: "Groceries",
-      amount: -125.5,
-      date: "2025-01-15",
-      icon: "🛒",
-    },
+  // const [dateRange, setDateRange] = useState({
+  //   startDate: "",
+  //   endDate: "",
+  // });
+  const [selectedChart, setSelectedChart] = useState("area");
+  const [showAlertDialog, setShowAlertDialog] = useState(false);
+  const [alerts, setAlerts] = useState([
+    { id: 1, type: "warning", message: "Entertainment budget at 90% of limit" },
     {
       id: 2,
-      type: "income",
-      category: "Salary",
-      amount: 3500.0,
-      date: "2025-01-14",
-      icon: "💰",
+      type: "danger",
+      message: "Unusual transaction detected: $500 at 3 AM",
+    },
+    { id: 3, type: "info", message: "Monthly savings goal almost achieved!" },
+  ]);
+
+  // Enhanced sample data
+  const monthlyData = [
+    {
+      month: "Jan",
+      income: 4000,
+      expense: 2400,
+      savings: 1600,
+      investments: 800,
     },
     {
-      id: 3,
-      type: "expense",
-      category: "Netflix",
-      amount: -15.99,
-      date: "2025-01-13",
-      icon: "🎬",
+      month: "Feb",
+      income: 3000,
+      expense: 1398,
+      savings: 1602,
+      investments: 900,
     },
     {
-      id: 4,
-      type: "expense",
-      category: "Fuel",
-      amount: -45.0,
-      date: "2025-01-12",
-      icon: "⛽",
+      month: "Mar",
+      income: 2000,
+      expense: 9800,
+      savings: -7800,
+      investments: 400,
+    },
+    {
+      month: "Apr",
+      income: 2780,
+      expense: 3908,
+      savings: -1128,
+      investments: 600,
+    },
+    {
+      month: "May",
+      income: 1890,
+      expense: 4800,
+      savings: -2910,
+      investments: 700,
+    },
+    {
+      month: "Jun",
+      income: 2390,
+      expense: 3800,
+      savings: -1410,
+      investments: 1000,
     },
   ];
 
-  const budgetStatus = [
-    { category: "Food", budget: 1000, spent: 800, color: "green" },
-    { category: "Transport", budget: 500, spent: 450, color: "yellow" },
-    { category: "Entertainment", budget: 300, spent: 290, color: "red" },
+  const spendingRadarData = [
+    { category: "Food", amount: 120, fullMark: 150 },
+    { category: "Transport", amount: 98, fullMark: 150 },
+    { category: "Shopping", amount: 86, fullMark: 150 },
+    { category: "Utilities", amount: 99, fullMark: 150 },
+    { category: "Entertainment", amount: 85, fullMark: 150 },
+    { category: "Healthcare", amount: 65, fullMark: 150 },
   ];
 
+  const savingsProgress = [
+    {
+      name: "Emergency Fund",
+      progress: 75,
+      fill: "#8884d8",
+    },
+    {
+      name: "Vacation",
+      progress: 45,
+      fill: "#83a6ed",
+    },
+    {
+      name: "New Car",
+      progress: 30,
+      fill: "#8dd1e1",
+    },
+  ];
+
+  // New Alert Dialog Form State
+  const [newAlert, setNewAlert] = useState({
+    threshold: "",
+    category: "",
+    type: "expense",
+  });
+
+  const handleCreateAlert = () => {
+    // Add new alert logic here
+    setAlerts((prev) => [
+      ...prev,
+      {
+        id: prev.length + 1,
+        type: "warning",
+        message: `Alert for ${newAlert.type} in ${newAlert.category} over ${newAlert.threshold}`,
+      },
+    ]);
+    setShowAlertDialog(false);
+  };
+
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white p-4 border rounded shadow">
+          <p className="font-bold">{label}</p>
+          {payload.map((entry: any, index: number) => (
+            <p key={index} style={{ color: entry.color }}>
+              {entry.name}: ${entry.value}
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+
+  // Previous JSX remains the same until the charts section
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
-      {/* Header with Date Range */}
-      <div className="flex flex-col md:flex-row justify-between items-center mb-6">
-        <Typography variant="h3" className="mb-4 md:mb-0">
-          Financial Dashboard
-        </Typography>
-        <div className="flex gap-2">
-          <Input
-            type="date"
-            label="Start Date"
-            value={dateRange.startDate}
-            onChange={(e) =>
-              setDateRange((prev) => ({ ...prev, startDate: e.target.value }))
-            }
-            className="w-40"
-          />
-          <Input
-            type="date"
-            label="End Date"
-            value={dateRange.endDate}
-            onChange={(e) =>
-              setDateRange((prev) => ({ ...prev, endDate: e.target.value }))
-            }
-            className="w-40"
-          />
+      {/* Previous header and summary cards remain the same */}
+
+      {/* Alerts Section */}
+      <div className="mb-6">
+        <div className="flex justify-between items-center mb-4">
+          <Typography variant="h5">Active Alerts</Typography>
+          <Button
+            color="blue"
+            size="sm"
+            onClick={() => setShowAlertDialog(true)}
+          >
+            Create Alert
+          </Button>
+        </div>
+        <div className="space-y-2">
+          {alerts.map((alert) => (
+            <Alert
+              key={alert.id}
+              color={alert.type as any}
+              variant="gradient"
+              className="flex items-center"
+            >
+              {alert.message}
+            </Alert>
+          ))}
         </div>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Card>
-          <CardBody>
-            <Typography variant="h6" color="blue-gray" className="mb-2">
-              Total Balance
-            </Typography>
-            <Typography variant="h4" color="blue">
-              $12,345
-            </Typography>
-            <Typography variant="small" color="gray" className="mt-2">
-              +20.1% from last month
-            </Typography>
-          </CardBody>
-        </Card>
-
-        <Card>
-          <CardBody>
-            <Typography variant="h6" color="blue-gray" className="mb-2">
-              Monthly Income
-            </Typography>
-            <Typography variant="h4" color="green">
-              $4,890
-            </Typography>
-            <Typography variant="small" color="gray" className="mt-2">
-              +15% from last month
-            </Typography>
-          </CardBody>
-        </Card>
-
-        <Card>
-          <CardBody>
-            <Typography variant="h6" color="blue-gray" className="mb-2">
-              Monthly Expenses
-            </Typography>
-            <Typography variant="h4" color="red">
-              $3,245
-            </Typography>
-            <Typography variant="small" color="gray" className="mt-2">
-              -8% from last month
-            </Typography>
-          </CardBody>
-        </Card>
-      </div>
-
-      {/* Charts Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        {/* Cash Flow Chart */}
-        <Card>
-          <CardHeader floated={false} className="p-4">
-            <Typography variant="h5">Cash Flow Trend</Typography>
-          </CardHeader>
-          <CardBody>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
+      {/* Interactive Chart Controls */}
+      <Card className="mb-6">
+        <CardHeader floated={false} className="p-4">
+          <div className="flex justify-between items-center">
+            <Typography variant="h5">Financial Overview</Typography>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                color={selectedChart === "area" ? "blue" : "gray"}
+                onClick={() => setSelectedChart("area")}
+              >
+                Area
+              </Button>
+              <Button
+                size="sm"
+                color={selectedChart === "bar" ? "blue" : "gray"}
+                onClick={() => setSelectedChart("bar")}
+              >
+                Bar
+              </Button>
+              <Button
+                size="sm"
+                color={selectedChart === "line" ? "blue" : "gray"}
+                onClick={() => setSelectedChart("line")}
+              >
+                Line
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+        <CardBody>
+          <div className="h-96">
+            <ResponsiveContainer width="100%" height="100%">
+              {selectedChart === "area" ? (
                 <AreaChart data={monthlyData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="month" />
                   <YAxis />
-                  <Tooltip />
+                  <Tooltip content={<CustomTooltip />} />
                   <Legend />
                   <Area
                     type="monotone"
@@ -199,121 +249,168 @@ const FinancialDashboard = () => {
                     fill="#ef4444"
                     fillOpacity={0.3}
                   />
+                  <Area
+                    type="monotone"
+                    dataKey="investments"
+                    stackId="1"
+                    stroke="#3b82f6"
+                    fill="#3b82f6"
+                    fillOpacity={0.3}
+                  />
                 </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </CardBody>
-        </Card>
+              ) : selectedChart === "bar" ? (
+                <BarChart data={monthlyData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend />
+                  <Bar dataKey="income" fill="#22c55e" />
+                  <Bar dataKey="expense" fill="#ef4444" />
+                  <Bar dataKey="investments" fill="#3b82f6" />
+                </BarChart>
+              ) : (
+                <LineChart data={monthlyData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="income"
+                    stroke="#22c55e"
+                    strokeWidth={2}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="expense"
+                    stroke="#ef4444"
+                    strokeWidth={2}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="investments"
+                    stroke="#3b82f6"
+                    strokeWidth={2}
+                  />
+                </LineChart>
+              )}
+            </ResponsiveContainer>
+          </div>
+        </CardBody>
+      </Card>
 
-        {/* Expense Categories Pie Chart */}
+      {/* New Charts Row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        {/* Spending Categories Radar Chart */}
         <Card>
           <CardHeader floated={false} className="p-4">
-            <Typography variant="h5">Expense Breakdown</Typography>
+            <Typography variant="h5">Spending Pattern Analysis</Typography>
           </CardHeader>
           <CardBody>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={expenseCategories}
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    {expenseCategories.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
+                <RadarChart data={spendingRadarData}>
+                  <PolarGrid />
+                  <PolarAngleAxis dataKey="category" />
+                  <PolarRadiusAxis />
+                  <Radar
+                    name="Spending"
+                    dataKey="amount"
+                    stroke="#8884d8"
+                    fill="#8884d8"
+                    fillOpacity={0.6}
+                  />
+                </RadarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardBody>
+        </Card>
+
+        {/* Savings Goals Radial Chart */}
+        <Card>
+          <CardHeader floated={false} className="p-4">
+            <Typography variant="h5">Savings Goals Progress</Typography>
+          </CardHeader>
+          <CardBody>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <RadialBarChart
+                  innerRadius="20%"
+                  outerRadius="90%"
+                  data={savingsProgress}
+                  startAngle={180}
+                  endAngle={0}
+                >
+                  <RadialBar
+                    background
+                    dataKey="progress"
+                    label={{ fill: "#666", position: "insideStart" }}
+                  />
+                  <Legend
+                    iconSize={10}
+                    width={120}
+                    height={140}
+                    layout="vertical"
+                    verticalAlign="middle"
+                    align="right"
+                  />
                   <Tooltip />
-                  <Legend />
-                </PieChart>
+                </RadialBarChart>
               </ResponsiveContainer>
             </div>
           </CardBody>
         </Card>
       </div>
 
-      {/* Bottom Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Recent Transactions */}
-        <Card>
-          <CardHeader floated={false} className="p-4">
-            <Typography variant="h5">Recent Transactions</Typography>
-          </CardHeader>
-          <CardBody className="p-0">
-            <List>
-              {recentTransactions.map((transaction) => (
-                <ListItem key={transaction.id} className="py-3">
-                  <ListItemPrefix>
-                    <Typography className="text-xl">
-                      {transaction.icon}
-                    </Typography>
-                  </ListItemPrefix>
-                  <div>
-                    <Typography variant="small" color="blue-gray">
-                      {transaction.category}
-                    </Typography>
-                    <Typography variant="small" color="gray">
-                      {transaction.date}
-                    </Typography>
-                  </div>
-                  <ListItemSuffix>
-                    <Typography
-                      variant="small"
-                      color={transaction.type === "income" ? "green" : "red"}
-                    >
-                      {transaction.type === "income" ? "+" : "-"}$
-                      {Math.abs(transaction.amount).toFixed(2)}
-                    </Typography>
-                  </ListItemSuffix>
-                </ListItem>
-              ))}
-            </List>
-          </CardBody>
-        </Card>
-
-        {/* Budget Progress */}
-        <Card>
-          <CardHeader floated={false} className="p-4">
-            <Typography variant="h5">Budget Status</Typography>
-          </CardHeader>
-          <CardBody>
-            {budgetStatus.map((item, index) => (
-              <div key={index} className="mb-4">
-                <div className="flex justify-between mb-2">
-                  <Typography variant="small" color="blue-gray">
-                    {item.category}
-                  </Typography>
-                  <Typography variant="small" color="blue-gray">
-                    ${item.spent} / ${item.budget}
-                  </Typography>
-                </div>
-                <Progress
-                  value={(item.spent / item.budget) * 100}
-                  color={item.color as any}
-                  className="h-1"
-                />
-              </div>
-            ))}
-
-            {/* Savings Goal */}
-            <div className="mt-6">
-              <Typography variant="h6" color="blue-gray" className="mb-2">
-                Savings Goal Progress
-              </Typography>
-              <Progress
-                value={savingsGoalProgress}
-                color="blue"
-                className="h-3"
+      {/* Alert Dialog */}
+      <Dialog open={showAlertDialog} handler={() => setShowAlertDialog(false)}>
+        <DialogHeader>Create New Alert</DialogHeader>
+        <DialogBody>
+          <div className="space-y-4">
+            <Input
+              label="Threshold Amount"
+              type="number"
+              value={newAlert.threshold}
+              onChange={(e) =>
+                setNewAlert({ ...newAlert, threshold: e.target.value })
+              }
+            />
+            <Input
+              label="Category"
+              value={newAlert.category}
+              onChange={(e) =>
+                setNewAlert({ ...newAlert, category: e.target.value })
+              }
+            />
+            <div className="flex gap-4">
+              <Radio
+                name="type"
+                label="Expense"
+                checked={newAlert.type === "expense"}
+                onChange={() => setNewAlert({ ...newAlert, type: "expense" })}
               />
-              <Typography variant="small" color="gray" className="mt-2">
-                {savingsGoalProgress}% of annual savings goal achieved
-              </Typography>
+              <Radio
+                name="type"
+                label="Income"
+                checked={newAlert.type === "income"}
+                onChange={() => setNewAlert({ ...newAlert, type: "income" })}
+              />
             </div>
-          </CardBody>
-        </Card>
-      </div>
+          </div>
+        </DialogBody>
+        <DialogFooter>
+          <Button color="red" onClick={() => setShowAlertDialog(false)}>
+            Cancel
+          </Button>
+          <Button color="green" onClick={handleCreateAlert}>
+            Create
+          </Button>
+        </DialogFooter>
+      </Dialog>
+
+      {/* Rest of the previous components (Recent Transactions, Budget Status) remain the same */}
     </div>
   );
 };

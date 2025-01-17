@@ -2,31 +2,7 @@ import { useState } from "react";
 import { Button, Typography } from "@material-tailwind/react";
 import BudgetList from "../components/Budget/BudgetList";
 import CreateBudgetModal from "../components/Budget/CreateBudgetModal";
-
-const mockBudgets = [
-  {
-    id: 1,
-    name: "Groceries",
-    type: "expense",
-    budgetFor: "all_expense",
-    startDate: "2023-01-01",
-    endDate: "2023-12-31",
-    limitAmount: 500,
-    remainingAmount: 200,
-    overdue: false,
-  },
-  {
-    id: 2,
-    name: "Salary",
-    type: "income",
-    budgetFor: "all_income",
-    startDate: "2023-01-01",
-    endDate: "2023-12-31",
-    limitAmount: 3000,
-    remainingAmount: 1500,
-    overdue: false,
-  },
-];
+import { mockBudgets } from "../constants/stats";
 
 function Budget() {
   const [budgets, setBudgets] = useState(mockBudgets);

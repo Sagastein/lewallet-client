@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { ChevronRight, ChevronLeft, Search } from "lucide-react";
-import { categories } from "../constants/data";
+import { categories } from "../../constants/data";
 
 const CategoryDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);

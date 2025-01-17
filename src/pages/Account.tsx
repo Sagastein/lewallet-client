@@ -1,6 +1,6 @@
 import { useState } from "react";
-import AddAccountModal from "../components/AddaccountModal";
-import AccountList from "../components/AccountList";
+import AddAccountModal from "../components/Account/AddaccountModal";
+import AccountList from "../components/Account/AccountList";
 import { Typography, Button } from "@material-tailwind/react";
 
 const mockAccounts = [

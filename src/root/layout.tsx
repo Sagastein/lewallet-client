@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import SideBar from "../components/SideBar";
 import NavBar from "../components/NavBar";
-import TransactionModal from "../components/TransactionModal"; // Import the modal component
+import TransactionModal from "../components/Account/TransactionModal"; // Import the modal component
 import { RiAddCircleLine } from "react-icons/ri";
 
 function Layout() {
