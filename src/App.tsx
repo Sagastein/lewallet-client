@@ -3,11 +3,12 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Layout from "./root/layout";
 import { Account, Bugdet, Dashabord, Report, Setting } from "./pages";
 import AccountDetail from "./pages/AccountDetail";
+import Welcome from "./pages/Welcome";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <div>hello to page</div>,
+    element: <Welcome />,
   },
   {
     path: "/portal",

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Card,
   CardHeader,
@@ -38,10 +38,10 @@ import {
 } from "recharts";
 
 const FinancialDashboard = () => {
-  const [dateRange, setDateRange] = useState({
-    startDate: "",
-    endDate: "",
-  });
+  // const [dateRange, setDateRange] = useState({
+  //   startDate: "",
+  //   endDate: "",
+  // });
   const [selectedChart, setSelectedChart] = useState("area");
   const [showAlertDialog, setShowAlertDialog] = useState(false);
   const [alerts, setAlerts] = useState([
