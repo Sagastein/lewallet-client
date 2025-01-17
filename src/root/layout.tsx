@@ -16,14 +16,17 @@ function Layout() {
       <div className="md:w-64">
         <SideBar />
       </div>
-      <section className="flex-1 h-full">
+      <section className="flex-1 overflow-hidden">
         <NavBar />
         <hr />
-        <Outlet />
+        <main className="h-[90vh] overflow-y-auto py-4 mb-12">
+          <Outlet />
+        </main>
+
         {/* Floating Button */}
         <button
           onClick={openModal}
-          className="fixed bottom-4 right-4 bg-green-500 text-white p-3 rounded-full shadow-lg"
+          className="fixed bottom-4 right-4 z-50 bg-green-500 text-white p-3 rounded-full shadow-lg"
         >
           <RiAddCircleLine size={24} />
         </button>
