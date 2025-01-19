@@ -1,3 +1,4 @@
+// components/AccountDetail.js
 import { useState } from "react";
 import {
   Typography,
@@ -12,37 +13,40 @@ import {
 } from "@material-tailwind/react";
 import { ArrowLeftIcon } from "lucide-react";
 import { BsCashCoin } from "react-icons/bs";
+import { useNavigate, useParams } from "react-router-dom";
+import useFetch from "../hooks/useFetch";
 
 const AccountDetail = () => {
   const [activeTab, setActiveTab] = useState("records");
+  const navigate = useNavigate();
+  const { accountId } = useParams();
+  console.log(accountId);
+  const {
+    data,
+    isLoading: loading,
+    error,
+  } = useFetch(`/api/account/${accountId}/details`);
 
-  const transactions = [
-    {
-      type: "Transfer, withdraw",
-      account: "Cash",
-      memo: "momo",
-      category: "kubitsa",
-      amount: -30000,
-    },
-    {
-      type: "Transfer, withdraw",
-      account: "Cash",
-      amount: -5000,
-    },
-    {
-      type: "Bar, cafe",
-      account: "Cash",
-      memo: "coding",
-      amount: -2000,
-    },
-  ];
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
+
+  const { account, records } = data;
 
   return (
     <div className="w-full max-w-4xl mx-auto bg-gray-50">
       {/* Header */}
       <div className="flex items-center justify-between p-4 bg-gray-50">
         <div className="flex items-center gap-4">
-          <IconButton variant="text" className="rounded-full">
+          <IconButton
+            onClick={() => navigate("/portal/accounts")}
+            variant="text"
+            className="rounded-full"
+          >
             <ArrowLeftIcon size={20} />
           </IconButton>
           <Typography variant="h6">Account Detail</Typography>
@@ -76,11 +80,11 @@ const AccountDetail = () => {
           <Typography variant="h6" color="blue-gray" className="text-sm">
             Name
           </Typography>
-          <Typography>Cash Coding</Typography>
+          <Typography>{account.name}</Typography>
           <Typography variant="h6" color="blue-gray" className="text-sm">
             Type
           </Typography>
-          <Typography>Cash</Typography>
+          <Typography>{account.type}</Typography>
         </div>
       </div>
 
@@ -118,21 +122,21 @@ const AccountDetail = () => {
                 Yesterday
               </Typography>
 
-              {transactions.map((transaction, index) => (
+              {records.map((record) => (
                 <div
-                  key={index}
+                  key={record._id}
                   className="flex items-center justify-between p-4 border-b"
                 >
                   <div className="flex items-center gap-4">
                     <Checkbox />
                     <div
                       className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        transaction.type.includes("Transfer")
+                        record.type.includes("Transfer")
                           ? "bg-green-500"
                           : "bg-red-500"
                       }`}
                     >
-                      {transaction.type.includes("Transfer") ? (
+                      {record.type.includes("Transfer") ? (
                         <svg
                           className="w-4 h-4 text-white"
                           viewBox="0 0 24 24"
@@ -151,15 +155,15 @@ const AccountDetail = () => {
                       )}
                     </div>
                     <div>
-                      <Typography>{transaction.type}</Typography>
+                      <Typography>{record.type}</Typography>
                       <Typography variant="small" color="blue-gray">
-                        {transaction.memo} {transaction.category}
+                        {record.memo} {record.category}
                       </Typography>
                     </div>
                   </div>
-                  <Typography color={transaction.amount < 0 ? "red" : "green"}>
-                    {transaction.amount < 0 ? "-" : "+"}RWF{" "}
-                    {Math.abs(transaction.amount).toLocaleString()}
+                  <Typography color={record.amount < 0 ? "red" : "green"}>
+                    {record.amount < 0 ? "-" : "+"}RWF{" "}
+                    {Math.abs(record.amount).toLocaleString()}
                   </Typography>
                 </div>
               ))}

@@ -1,3 +1,4 @@
+// components/AddCurrencyModal.js
 import { useState } from "react";
 import {
   Button,
@@ -7,12 +8,19 @@ import {
   DialogFooter,
   Input,
 } from "@material-tailwind/react";
+import usePost from "../../hooks/usePost";
+
 function AddCurrencyModal({ isOpen, onClose, onAddCurrency }) {
   const [currencyCode, setCurrencyCode] = useState("");
   const [currencyName, setCurrencyName] = useState("");
+  const { loading, error, postData } = usePost(
+    "/api/currency"
+  );
 
-  const handleAddCurrency = () => {
-    onAddCurrency({ code: currencyCode, name: currencyName });
+  const handleAddCurrency = async () => {
+    const newCurrency = { code: currencyCode, name: currencyName };
+    const responseData = await postData(newCurrency);
+    onAddCurrency(responseData);
     setCurrencyCode("");
     setCurrencyName("");
     onClose();
@@ -38,12 +46,18 @@ function AddCurrencyModal({ isOpen, onClose, onAddCurrency }) {
             className="w-full"
           />
         </div>
+        {error && <p className="text-red-500">Error: {error.message}</p>}
       </DialogBody>
       <DialogFooter>
-        <Button variant="text" color="red" onClick={onClose}>
+        <Button variant="text" color="red" onClick={onClose} disabled={loading}>
           Cancel
         </Button>
-        <Button variant="gradient" color="green" onClick={handleAddCurrency}>
+        <Button
+          variant="gradient"
+          color="green"
+          onClick={handleAddCurrency}
+          disabled={loading}
+        >
           Add Currency
         </Button>
       </DialogFooter>

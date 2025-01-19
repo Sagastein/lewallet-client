@@ -1,11 +1,24 @@
-import { useState } from "react";
+// pages/Budget.js
+import { useState, useEffect } from "react";
 import { Button, Typography } from "@material-tailwind/react";
 import BudgetList from "../components/Budget/BudgetList";
 import CreateBudgetModal from "../components/Budget/CreateBudgetModal";
-import { mockBudgets } from "../constants/stats";
+import useFetch from "../hooks/useFetch";
 
 function Budget() {
-  const [budgets, setBudgets] = useState(mockBudgets);
+  const {
+    data,
+    error,
+    isLoading,
+  } = useFetch("/api/budget");
+
+  const [budgets, setBudgets] = useState([]);
+
+  useEffect(() => {
+    if (data) {
+      setBudgets(data);
+    }
+  }, [data]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBudget, setEditingBudget] = useState(null);
 
@@ -13,18 +26,23 @@ function Budget() {
   const closeModal = () => setIsModalOpen(false);
 
   const handleCreateBudget = (newBudget) => {
-    setBudgets([...budgets, { ...newBudget, id: budgets.length + 1 }]);
+    // Assuming the backend handles the ID generation
+    setBudgets((prevBudgets) => [...prevBudgets, newBudget]);
   };
 
   const handleEditBudget = (budget) => {
-    console.log(editingBudget);
     setEditingBudget(budget);
     setIsModalOpen(true);
   };
 
   const handleDeleteBudget = (id) => {
-    setBudgets(budgets.filter((budget) => budget.id !== id));
+    setBudgets((prevBudgets) =>
+      prevBudgets.filter((budget) => budget._id !== id)
+    );
   };
+
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
 
   return (
     <main className="p-4 bg-gray-100 min-h-screen">
@@ -50,6 +68,7 @@ function Budget() {
         isOpen={isModalOpen}
         onClose={closeModal}
         onCreate={handleCreateBudget}
+        editingBudget={editingBudget}
       />
     </main>
   );

@@ -1,3 +1,4 @@
+// components/Budget/BudgetCard.js
 import {
   Card,
   Typography,
@@ -34,7 +35,7 @@ function BudgetCard({ budget, onEdit, onDelete }) {
               <FaEdit className="mr-2 text-blue-500" /> Edit
             </Button>
             <Button
-              onClick={() => onDelete(budget.id)}
+              onClick={() => onDelete(budget._id)}
               className="flex items-center w-full hover:bg-red-100 transition-colors duration-200"
             >
               <FaTrash className="mr-2 text-red-500" /> Delete
@@ -44,11 +45,13 @@ function BudgetCard({ budget, onEdit, onDelete }) {
       </div>
       <div className="flex-1 mt-8">
         <Typography variant="h5" className="mb-2 flex items-center">
-          <FaMoneyBillWave className="mr-2 text-green-500" /> {budget.name}
+          <FaMoneyBillWave className="mr-2 text-green-500" />{" "}
+          {budget.accontName}
         </Typography>
         <Typography variant="paragraph" className="mb-2 flex items-center">
           <FaCalendarAlt className="mr-2 text-purple-500" /> Period:{" "}
-          {budget.startDate} - {budget.endDate}
+          {new Date(budget.startDate).toLocaleDateString()} -{" "}
+          {new Date(budget.endDate).toLocaleDateString()}
         </Typography>
         <Typography variant="paragraph" className="mb-2 flex items-center">
           {budget.remainingAmount >= 0 ? (
@@ -61,11 +64,11 @@ function BudgetCard({ budget, onEdit, onDelete }) {
         </Typography>
         <Typography variant="paragraph" className="mb-2 flex items-center">
           <FaExclamationCircle className="mr-2 text-yellow-500" /> Overdue:{" "}
-          {budget.overdue ? "Yes" : "No"}
+          {budget.isOverdue ? "Yes" : "No"}
         </Typography>
         <Typography variant="paragraph" className="mb-2 flex items-center">
           <FaMoneyBillWave className="mr-2 text-blue-500" /> Limit Amount:{" "}
-          {budget.limitAmount}
+          {budget.amount}
         </Typography>
         <Typography variant="paragraph" className="flex items-center">
           <FaMoneyBillWave className="mr-2 text-indigo-500" /> Remaining Amount:{" "}
