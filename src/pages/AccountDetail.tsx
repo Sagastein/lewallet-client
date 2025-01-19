@@ -25,7 +25,7 @@ const AccountDetail = () => {
     data,
     isLoading: loading,
     error,
-  } = useFetch(`http://localhost:8080/v1/api/account/${accountId}/details`);
+  } = useFetch(`/api/account/${accountId}/details`);
 
   if (loading) {
     return <div>Loading...</div>;

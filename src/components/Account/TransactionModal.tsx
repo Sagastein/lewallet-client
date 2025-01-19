@@ -1,9 +1,10 @@
-// components/TransactionModal.js
 import { useState, useEffect } from "react";
 import { X, Calendar, Clock, Wallet } from "lucide-react";
 import CategoryDropdown from "../../components/Account/CategoryDropDown";
 import usePost from "../../hooks/usePost";
 import useFetch from "../../hooks/useFetch";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const TransactionModal = ({ isOpen, onClose }) => {
   const [activeTab, setActiveTab] = useState("Expense");
@@ -23,11 +24,11 @@ const TransactionModal = ({ isOpen, onClose }) => {
   const [location, setLocation] = useState("");
   const [label, setLabel] = useState("");
   const { loading, error, postData } = usePost(
-    "http://localhost:8080/v1/api/record"
+    "/api/record"
   );
-  const { data: accounts } = useFetch("http://localhost:8080/v1/api/account");
+  const { data: accounts } = useFetch("/api/account");
   const { data: currencies } = useFetch(
-    "http://localhost:8080/v1/api/currency"
+    "/api/currency"
   );
 
   useEffect(() => {
@@ -40,17 +41,31 @@ const TransactionModal = ({ isOpen, onClose }) => {
   }, [accounts, currencies]);
 
   const tabs = ["Expense", "Income", "Transfer"];
-  if (error) return <p>Error: {error.message}</p>;
+  if (error) return <div>Error: {error.message}</div>;
   const handleSave = async () => {
     if (activeTab === "Transfer" && (!fromAccount || !toAccount)) {
-      alert("From Account and To Account are required for Transfer type.");
+      toast.error(
+        "From Account and To Account are required for Transfer type."
+      );
       return;
     }
-    // fromAccount and toAccount are required for Transfer type and should not be the same
+
     if (activeTab === "Transfer" && fromAccount === toAccount) {
-      alert("From Account and To Account should not be the same.");
+      toast.error("From Account and To Account should not be the same.");
       return;
     }
+
+    const selectedAccountDetails = accounts.find(
+      (acc) => acc._id.toString() === selectedAccount
+    );
+    if (
+      activeTab === "Expense" &&
+      parseFloat(amount) > selectedAccountDetails.currentBalance
+    ) {
+      toast.error("Insufficient funds for this expense.");
+      return;
+    }
+
     const newRecord = {
       type: activeTab.toLowerCase(),
       amount: parseFloat(amount),
@@ -66,24 +81,30 @@ const TransactionModal = ({ isOpen, onClose }) => {
       note,
       location,
     };
-    await postData(newRecord);
-    setActiveTab("Expense");
-    setSelectedAccount("");
-    setSelectedCurrency("");
-    setSelectedPaymentType("Cash");
-    setSelectedPaymentStatus("Cleared");
-    setFromAccount("");
-    setToAccount("");
-    setAmount("");
-    setCategory("");
-    setDate(new Date().toISOString().split("T")[0]);
-    setTime(new Date().toTimeString().split(" ")[0]);
-    setPayee("");
-    setPayer("");
-    setNote("");
-    setLocation("");
-    setLabel("");
-    onClose();
+
+    try {
+      await postData(newRecord);
+      toast.success("Record added successfully!");
+      setActiveTab("Expense");
+      setSelectedAccount("");
+      setSelectedCurrency("");
+      setSelectedPaymentType("Cash");
+      setSelectedPaymentStatus("Cleared");
+      setFromAccount("");
+      setToAccount("");
+      setAmount("");
+      setCategory("");
+      setDate(new Date().toISOString().split("T")[0]);
+      setTime(new Date().toTimeString().split(" ")[0]);
+      setPayee("");
+      setPayer("");
+      setNote("");
+      setLocation("");
+      setLabel("");
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to add record. Please try again.");
+    }
   };
 
   const renderTransferSection = () => (
@@ -316,6 +337,17 @@ const TransactionModal = ({ isOpen, onClose }) => {
           </select>
         </div>
       </div>
+
+      {/* Payer */}
+      <div className="mb-3">
+        <label className="block mb-1 text-sm">Payer</label>
+        <input
+          type="text"
+          value={payer}
+          onChange={(e) => setPayer(e.target.value)}
+          className="w-full p-2 rounded-md text-gray-700"
+        />
+      </div>
     </div>
   );
 
@@ -514,6 +546,7 @@ const TransactionModal = ({ isOpen, onClose }) => {
           </div>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };

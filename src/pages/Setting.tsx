@@ -20,7 +20,7 @@ function Settings() {
     error,
     isLoading,
     mutate,
-  } = useFetch("http://localhost:8080/v1/api/currency");
+  } = useFetch("/api/currency");
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);

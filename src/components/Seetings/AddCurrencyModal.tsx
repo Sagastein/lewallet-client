@@ -14,7 +14,7 @@ function AddCurrencyModal({ isOpen, onClose, onAddCurrency }) {
   const [currencyCode, setCurrencyCode] = useState("");
   const [currencyName, setCurrencyName] = useState("");
   const { loading, error, postData } = usePost(
-    "http://localhost:8080/v1/api/currency"
+    "/api/currency"
   );
 
   const handleAddCurrency = async () => {

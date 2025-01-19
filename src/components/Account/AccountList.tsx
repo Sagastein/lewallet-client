@@ -47,6 +47,9 @@ function AccountList({ accounts }) {
                   (Limit {account.currency} {account.limit})
                 </Typography>
               )}
+              <Typography variant="paragraph" className="text-gray-600">
+                Current Balance: {account.currency} {account.currentBalance}
+              </Typography>
             </div>
           </Link>
         );

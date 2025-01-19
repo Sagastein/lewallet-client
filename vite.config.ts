@@ -9,6 +9,7 @@ export default defineConfig({
     proxy: {
       "/api": {
         target: "https://lewallet-server.onrender.com/v1/api",
+        // target: "http://localhost:8080/v1/api",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
