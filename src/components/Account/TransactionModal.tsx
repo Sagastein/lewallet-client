@@ -337,17 +337,6 @@ const TransactionModal = ({ isOpen, onClose }) => {
           </select>
         </div>
       </div>
-
-      {/* Payer */}
-      <div className="mb-3">
-        <label className="block mb-1 text-sm">Payer</label>
-        <input
-          type="text"
-          value={payer}
-          onChange={(e) => setPayer(e.target.value)}
-          className="w-full p-2 rounded-md text-gray-700"
-        />
-      </div>
     </div>
   );
 
