@@ -5,14 +5,5 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react()],
   //vite proxy
-  server: {
-    proxy: {
-      "/api": {
-        target: "https://lewallet-server.onrender.com/v1/api",
-        // target: "http://localhost:8080/v1/api",
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
-      },
-    },
-  },
+
 });
