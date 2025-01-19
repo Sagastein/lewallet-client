@@ -46,7 +46,7 @@ function BudgetCard({ budget, onEdit, onDelete }) {
       <div className="flex-1 mt-8">
         <Typography variant="h5" className="mb-2 flex items-center">
           <FaMoneyBillWave className="mr-2 text-green-500" />{" "}
-          {budget.accounts[0]?.name || budget.budgetFor}
+          {budget.accontName}
         </Typography>
         <Typography variant="paragraph" className="mb-2 flex items-center">
           <FaCalendarAlt className="mr-2 text-purple-500" /> Period:{" "}

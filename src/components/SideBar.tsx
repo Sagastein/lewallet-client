@@ -54,7 +54,7 @@ function SideBar() {
         {isOpen ? <RiCloseLine /> : <RiMenuLine />}
       </button>
       <aside
-        className={`fixed inset-y-0 left-0 w-64 px-2 bg-white border-r transition-transform duration-300 transform md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 w-64 px-2 bg-white border-r transition-transform duration-300 transform md:translate-x-0 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >

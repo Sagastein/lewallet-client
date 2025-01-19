@@ -21,7 +21,7 @@ function ExchangeRateTable({ currencies }) {
   }, []);
 
   return (
-    <Card className="p-4">
+    <Card className="p-4 overflow-auto">
       <Typography variant="h2" className="text-xl font-semibold mb-2">
         Exchange Rates
       </Typography>

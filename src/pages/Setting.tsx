@@ -1,27 +1,41 @@
 import { useState } from "react";
-import { Button } from "@material-tailwind/react";
-import { Card, Typography } from "@material-tailwind/react";
-
-import { Select, Option, Switch } from "@material-tailwind/react";
+import {
+  Button,
+  Card,
+  Typography,
+  Select,
+  Option,
+  Switch,
+} from "@material-tailwind/react";
 import { AddCurrencyModal } from "../components/Seetings/AddCurrencyModal";
 import { ExchangeRateTable } from "../components/Seetings/ExchangeRateTable";
+import useFetch from "../hooks/useFetch";
 
 function Settings() {
   const [currency, setCurrency] = useState("USD");
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currencies, setCurrencies] = useState([
-    { code: "USD", name: "US Dollar" },
-    { code: "EUR", name: "Euro" },
-    { code: "JPY", name: "Japanese Yen" },
-  ]);
+  const {
+    data: currencies,
+    error,
+    isLoading,
+    mutate,
+  } = useFetch("http://localhost:8080/v1/api/currency");
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
   const handleAddCurrency = (newCurrency) => {
-    setCurrencies([...currencies, newCurrency]);
+    // Update the local state
+    mutate([...currencies, newCurrency], false).then(() => {
+      // Close the modal after adding the currency
+      closeModal();
+    });
   };
+
+  console.log("Settings.tsx", currencies);
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
 
   return (
     <main className="p-4 bg-white w-full mx-auto">

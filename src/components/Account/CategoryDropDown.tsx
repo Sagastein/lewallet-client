@@ -1,11 +1,11 @@
+// components/CategoryDropdown.js
 import { useState, useRef, useEffect } from "react";
 import { ChevronRight, ChevronLeft, Search } from "lucide-react";
 import { categories } from "../../constants/data";
 
-const CategoryDropdown = () => {
+const CategoryDropdown = ({ selectedCategory, setSelectedCategory }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState(null);
   const [activeCategory, setActiveCategory] = useState(null);
   const [showSubcategories, setShowSubcategories] = useState(false);
   const dropdownRef = useRef(null);
@@ -48,7 +48,7 @@ const CategoryDropdown = () => {
       {/* Main Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-3 py-2  text-left border border-black rounded-md hover:border-gray-300 flex items-center justify-between"
+        className="w-full px-3 py-2 text-left border border-black rounded-md hover:border-gray-300 flex items-center justify-between"
       >
         <span className="text-gray-700">
           {selectedCategory || "Choose category"}
@@ -109,7 +109,7 @@ const CategoryDropdown = () => {
               </div>
 
               {/* Main Categories List */}
-              <div className=" h-36 overflow-y-auto">
+              <div className="h-36 overflow-y-auto">
                 {filteredCategories.map((category) => (
                   <button
                     key={category.id}

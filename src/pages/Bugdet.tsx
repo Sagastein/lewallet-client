@@ -1,5 +1,5 @@
 // pages/Budget.js
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button, Typography } from "@material-tailwind/react";
 import BudgetList from "../components/Budget/BudgetList";
 import CreateBudgetModal from "../components/Budget/CreateBudgetModal";
@@ -7,10 +7,18 @@ import useFetch from "../hooks/useFetch";
 
 function Budget() {
   const {
-    data: budgets,
+    data,
     error,
     isLoading,
-  } = useFetch("http://localhost:8080/v1/api/budget");
+  } = useFetch("/api/budget");
+
+  const [budgets, setBudgets] = useState([]);
+
+  useEffect(() => {
+    if (data) {
+      setBudgets(data);
+    }
+  }, [data]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBudget, setEditingBudget] = useState(null);
 

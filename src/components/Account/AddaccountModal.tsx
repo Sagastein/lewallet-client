@@ -1,3 +1,4 @@
+// components/Account/AddAccountModal.js
 import { useState } from "react";
 import {
   Button,
@@ -11,6 +12,7 @@ import {
   Switch,
 } from "@material-tailwind/react";
 import { RiCloseLine } from "react-icons/ri";
+import usePost from "../../hooks/usePost";
 
 function AddAccountModal({ isOpen, onClose }) {
   const [accountName, setAccountName] = useState("");
@@ -18,9 +20,22 @@ function AddAccountModal({ isOpen, onClose }) {
   const [initialAmount, setInitialAmount] = useState(0);
   const [currency, setCurrency] = useState("RWF");
   const [excludeFromStatistics, setExcludeFromStatistics] = useState(false);
+  const { loading, error, postData } = usePost("/api/account");
 
-  const handleSave = () => {
-    // Handle save logic here
+  const handleSave = async () => {
+    const newAccount = {
+      name: accountName,
+      type: accountType,
+      initialAmount: initialAmount,
+      currency,
+      excludeFromStatistics,
+    };
+    await postData(newAccount);
+    setAccountName("");
+    setAccountType("General");
+    setInitialAmount(0);
+    setCurrency("RWF");
+    setExcludeFromStatistics(false);
     onClose();
   };
 
@@ -68,6 +83,7 @@ function AddAccountModal({ isOpen, onClose }) {
             <Option value="General">General</Option>
             <Option value="Savings">Savings</Option>
             <Option value="Investment">Investment</Option>
+            <Option value="Credit">Credit</Option>
           </Select>
         </div>
         <div className="mb-4">
@@ -96,12 +112,18 @@ function AddAccountModal({ isOpen, onClose }) {
             onChange={() => setExcludeFromStatistics(!excludeFromStatistics)}
           />
         </div>
+        {error && <p className="text-red-500">{error.message}</p>}
       </DialogBody>
       <DialogFooter>
-        <Button variant="text" color="red" onClick={onClose}>
+        <Button variant="text" color="red" onClick={onClose} disabled={loading}>
           Cancel
         </Button>
-        <Button variant="gradient" color="green" onClick={handleSave}>
+        <Button
+          variant="gradient"
+          color="green"
+          onClick={handleSave}
+          disabled={loading}
+        >
           Save
         </Button>
       </DialogFooter>
