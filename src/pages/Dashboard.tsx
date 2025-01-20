@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Card,
   CardHeader,
@@ -29,14 +29,43 @@ import {
   monthlyData,
   budgetStatus,
   expenseCategories,
-  recentTransactions,
 } from "../constants/stats";
+import {
+  FaSearch,
+  FaMoneyBill,
+  FaCreditCard,
+  FaExchangeAlt,
+  FaRandom,
+} from "react-icons/fa";
+import useFetch from "../hooks/useFetch";
 
 const FinancialDashboard = () => {
   const [dateRange, setDateRange] = useState({
     startDate: "",
     endDate: "",
   });
+  const getRandomIcon = () => {
+    const icons = [
+      FaSearch,
+      FaMoneyBill,
+      FaCreditCard,
+      FaExchangeAlt,
+      FaRandom,
+    ];
+    const randomIndex = Math.floor(Math.random() * icons.length);
+    return icons[randomIndex];
+  };
+  const {
+    data: recentTransactions,
+    isLoading: loading,
+    error,
+  } = useFetch("/api/record/recent");
+  const { data: cashflow, error: cashflowError } = useFetch(
+    "/api/record/cashflow"
+  );
+  const {data:stats,isLoading} = useFetch("/api/record/stats");
+  if (loading || isLoading) return <p>Loading...</p>;
+  if (error || cashflowError) return <p>Error: {cashflowError.message}</p>;
 
   const savingsGoalProgress = 65;
 
@@ -79,7 +108,7 @@ const FinancialDashboard = () => {
               Total Balance
             </Typography>
             <Typography variant="h4" color="blue">
-              $12,345
+              ${stats.totalBalance}
             </Typography>
             <Typography variant="small" color="gray" className="mt-2">
               +20.1% from last month
@@ -93,7 +122,7 @@ const FinancialDashboard = () => {
               Monthly Income
             </Typography>
             <Typography variant="h4" color="green">
-              $4,890
+              ${stats.totalIncome}
             </Typography>
             <Typography variant="small" color="gray" className="mt-2">
               +15% from last month
@@ -107,7 +136,7 @@ const FinancialDashboard = () => {
               Monthly Expenses
             </Typography>
             <Typography variant="h4" color="red">
-              $3,245
+              ${stats.totalExpense}
             </Typography>
             <Typography variant="small" color="gray" className="mt-2">
               -8% from last month
@@ -126,9 +155,9 @@ const FinancialDashboard = () => {
           <CardBody>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={monthlyData}>
+                <AreaChart data={cashflow}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
+                  <XAxis dataKey="_id" />
                   <YAxis />
                   <Tooltip />
                   <Legend />
@@ -193,18 +222,21 @@ const FinancialDashboard = () => {
           <CardBody className="p-0">
             <List>
               {recentTransactions.map((transaction) => (
-                <ListItem key={transaction.id} className="py-3">
+                <ListItem key={transaction._id} className="py-3">
                   <ListItemPrefix>
                     <Typography className="text-xl">
-                      {transaction.icon}
+                      {React.createElement(getRandomIcon())}{" "}
+                      {/* Add a random icon */}
                     </Typography>
                   </ListItemPrefix>
                   <div>
                     <Typography variant="small" color="blue-gray">
-                      {transaction.category}
+                      {transaction.type.charAt(0).toUpperCase() +
+                        transaction.type.slice(1)}
                     </Typography>
                     <Typography variant="small" color="gray">
-                      {transaction.date}
+                      {new Date(transaction.date).toLocaleDateString()}{" "}
+                      {/* Format the date */}
                     </Typography>
                   </div>
                   <ListItemSuffix>
