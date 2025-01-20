@@ -26,7 +26,10 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({
       </div>
       <ul>
         {notifications.map((notification) => (
-          <li key={notification.id} className="mb-2 cursor-pointer hover:bg-gray- border-b">
+          <li
+            key={notification.id}
+            className="mb-2 cursor-pointer hover:bg-gray-100 border-b"
+          >
             <div className="flex items-center">
               <div className="text-gray-500 text-sm">
                 {notification.timestamp}
