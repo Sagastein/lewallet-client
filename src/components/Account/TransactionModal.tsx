@@ -1,35 +1,56 @@
 import { useState, useEffect } from "react";
 import { X, Calendar, Clock, Wallet } from "lucide-react";
 import CategoryDropdown from "../../components/Account/CategoryDropDown";
-import usePost from "../../hooks/usePost";
+import axios from "axios";
 import useFetch from "../../hooks/useFetch";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const TransactionModal = ({ isOpen, onClose }) => {
-  const [activeTab, setActiveTab] = useState("Expense");
-  const [selectedAccount, setSelectedAccount] = useState("");
-  const [selectedCurrency, setSelectedCurrency] = useState("");
-  const [selectedPaymentType, setSelectedPaymentType] = useState("Cash");
-  const [selectedPaymentStatus, setSelectedPaymentStatus] = useState("Cleared");
-  const [fromAccount, setFromAccount] = useState("");
-  const [toAccount, setToAccount] = useState("");
-  const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState("");
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-  const [time, setTime] = useState(new Date().toTimeString().split(" ")[0]);
-  const [payee, setPayee] = useState("");
-  const [payer, setPayer] = useState("");
-  const [note, setNote] = useState("");
-  const [location, setLocation] = useState("");
-  const [label, setLabel] = useState("");
-  const { loading, error, postData } = usePost(
-    "/api/record"
+interface Errors {
+  amount?: string;
+  selectedAccount?: string;
+  category?: string;
+  fromAccount?: string;
+  toAccount?: string;
+  payee?: string;
+  payer?: string;
+}
+
+const TransactionModal = ({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) => {
+  const [activeTab, setActiveTab] = useState<"Expense" | "Income" | "Transfer">(
+    "Expense"
   );
+  const [selectedAccount, setSelectedAccount] = useState<string>("");
+  const [selectedCurrency, setSelectedCurrency] = useState<string>("");
+  const [selectedPaymentType, setSelectedPaymentType] =
+    useState<string>("Cash");
+  const [selectedPaymentStatus, setSelectedPaymentStatus] =
+    useState<string>("Cleared");
+  const [fromAccount, setFromAccount] = useState<string>("");
+  const [toAccount, setToAccount] = useState<string>("");
+  const [amount, setAmount] = useState<string>("");
+  const [category, setCategory] = useState<string>("");
+  const [date, setDate] = useState<string>(
+    new Date().toISOString().split("T")[0]
+  );
+  const [time, setTime] = useState<string>(
+    new Date().toTimeString().split(" ")[0]
+  );
+  const [payee, setPayee] = useState<string>("");
+  const [payer, setPayer] = useState<string>("");
+  const [note, setNote] = useState<string>("");
+  const [location, setLocation] = useState<string>("");
+  const [label, setLabel] = useState<string>("");
+  const [errors, setErrors] = useState<Errors>({});
+  const [loading, setLoading] = useState<boolean>(false);
   const { data: accounts } = useFetch("/api/account");
-  const { data: currencies } = useFetch(
-    "/api/currency"
-  );
+  const { data: currencies } = useFetch("/api/currency");
 
   useEffect(() => {
     if (accounts && accounts.length > 0) {
@@ -41,25 +62,52 @@ const TransactionModal = ({ isOpen, onClose }) => {
   }, [accounts, currencies]);
 
   const tabs = ["Expense", "Income", "Transfer"];
-  if (error) return <div>Error: {error.message}</div>;
+
+  const validateForm = () => {
+    const newErrors: Errors = {};
+    if (!amount || isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) {
+      newErrors.amount = "Amount is required and must be a positive number.";
+    }
+    if (activeTab !== "Transfer") {
+      if (!selectedAccount) {
+        newErrors.selectedAccount = "Account is required.";
+      }
+      if (activeTab === "Expense" && !category) {
+        newErrors.category = "Category is required.";
+      }
+    } else {
+      if (!fromAccount) {
+        newErrors.fromAccount = "From Account is required.";
+      }
+      if (!toAccount) {
+        newErrors.toAccount = "To Account is required.";
+      }
+      if (fromAccount === toAccount) {
+        newErrors.toAccount =
+          "From Account and To Account should not be the same.";
+      }
+    }
+    if (activeTab === "Expense" && !payee) {
+      newErrors.payee = "Payee is required.";
+    }
+    if (activeTab === "Income" && !payer) {
+      newErrors.payer = "Payer is required.";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSave = async () => {
-    if (activeTab === "Transfer" && (!fromAccount || !toAccount)) {
-      toast.error(
-        "From Account and To Account are required for Transfer type."
-      );
+    if (!validateForm()) {
       return;
     }
 
-    if (activeTab === "Transfer" && fromAccount === toAccount) {
-      toast.error("From Account and To Account should not be the same.");
-      return;
-    }
-
-    const selectedAccountDetails = accounts.find(
+    const selectedAccountDetails = accounts?.find(
       (acc) => acc._id.toString() === selectedAccount
     );
     if (
       activeTab === "Expense" &&
+      selectedAccountDetails &&
       parseFloat(amount) > selectedAccountDetails.currentBalance
     ) {
       toast.error("Insufficient funds for this expense.");
@@ -82,8 +130,9 @@ const TransactionModal = ({ isOpen, onClose }) => {
       location,
     };
 
+    setLoading(true);
     try {
-      await postData(newRecord);
+      await axios.post("/api/record", newRecord);
       toast.success("Record added successfully!");
       setActiveTab("Expense");
       setSelectedAccount("");
@@ -101,9 +150,17 @@ const TransactionModal = ({ isOpen, onClose }) => {
       setNote("");
       setLocation("");
       setLabel("");
+      setErrors({});
+      // onClose(); // Close the modal after successful save
     } catch (err) {
       console.log(err);
-      toast.error("Failed to add record. Please try again.");
+      if (err.response && err.response.data && err.response.data.message) {
+        toast.error(err.response.data.message);
+      } else {
+        toast.error("Failed to add record. Please try again.");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -114,7 +171,9 @@ const TransactionModal = ({ isOpen, onClose }) => {
         {tabs.map((tab) => (
           <button
             key={tab}
-            onClick={() => setActiveTab(tab)}
+            onClick={() =>
+              setActiveTab(tab as "Expense" | "Income" | "Transfer")
+            }
             className={`flex-1 py-2 border border-white px-4 ${
               activeTab === tab ? "bg-green-500 text-white" : "text-gray-600"
             } first:rounded-l-md border border-white last:rounded-r-md`}
@@ -146,6 +205,9 @@ const TransactionModal = ({ isOpen, onClose }) => {
             </select>
             <Wallet className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
           </div>
+          {errors.fromAccount && (
+            <p className="text-red-500 text-sm">{errors.fromAccount}</p>
+          )}
         </div>
 
         <div>
@@ -168,6 +230,9 @@ const TransactionModal = ({ isOpen, onClose }) => {
             </select>
             <Wallet className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
           </div>
+          {errors.toAccount && (
+            <p className="text-red-500 text-sm">{errors.toAccount}</p>
+          )}
         </div>
       </div>
 
@@ -183,6 +248,9 @@ const TransactionModal = ({ isOpen, onClose }) => {
               className="w-full p-2 rounded-md text-gray-700"
               placeholder="-"
             />
+            {errors.amount && (
+              <p className="text-red-500 text-sm">{errors.amount}</p>
+            )}
           </div>
           <div className="w-32">
             <label className="block mb-1 text-sm">Currency</label>
@@ -211,7 +279,9 @@ const TransactionModal = ({ isOpen, onClose }) => {
         {tabs.map((tab) => (
           <button
             key={tab}
-            onClick={() => setActiveTab(tab)}
+            onClick={() =>
+              setActiveTab(tab as "Expense" | "Income" | "Transfer")
+            }
             className={`flex-1 border border-white py-2 px-4 ${
               activeTab === tab ? "bg-[#796156] text-white" : "text-gray-600"
             } first:rounded-l-md last:rounded-r-md`}
@@ -239,6 +309,9 @@ const TransactionModal = ({ isOpen, onClose }) => {
           </select>
           <Wallet className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
         </div>
+        {errors.selectedAccount && (
+          <p className="text-red-500 text-sm">{errors.selectedAccount}</p>
+        )}
       </div>
 
       {/* Amount and Currency */}
@@ -252,6 +325,9 @@ const TransactionModal = ({ isOpen, onClose }) => {
             className="w-full p-2 rounded-md text-gray-700"
             placeholder="-"
           />
+          {errors.amount && (
+            <p className="text-red-500 text-sm">{errors.amount}</p>
+          )}
         </div>
         <div className="w-32">
           <label className="block mb-1 text-sm">Currency</label>
@@ -279,7 +355,9 @@ const TransactionModal = ({ isOpen, onClose }) => {
         {tabs.map((tab) => (
           <button
             key={tab}
-            onClick={() => setActiveTab(tab)}
+            onClick={() =>
+              setActiveTab(tab as "Expense" | "Income" | "Transfer")
+            }
             className={`flex-1 border border-white py-2 px-4 ${
               activeTab === tab ? "bg-blue-500 text-white" : "text-gray-600"
             } first:rounded-l-md last:rounded-r-md`}
@@ -307,6 +385,9 @@ const TransactionModal = ({ isOpen, onClose }) => {
           </select>
           <Wallet className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
         </div>
+        {errors.selectedAccount && (
+          <p className="text-red-500 text-sm">{errors.selectedAccount}</p>
+        )}
       </div>
 
       {/* Amount and Currency */}
@@ -320,6 +401,9 @@ const TransactionModal = ({ isOpen, onClose }) => {
             className="w-full p-2 rounded-md text-gray-700"
             placeholder="-"
           />
+          {errors.amount && (
+            <p className="text-red-500 text-sm">{errors.amount}</p>
+          )}
         </div>
         <div className="w-32">
           <label className="block mb-1 text-sm">Currency</label>
@@ -367,7 +451,7 @@ const TransactionModal = ({ isOpen, onClose }) => {
 
             {/* Common fields */}
             <div className="p-4">
-              {activeTab !== "Transfer" && (
+              {activeTab !== "Income" && (
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-sm text-gray-700 mb-1">
@@ -377,6 +461,9 @@ const TransactionModal = ({ isOpen, onClose }) => {
                       selectedCategory={category}
                       setSelectedCategory={setCategory}
                     />
+                    {errors.category && (
+                      <p className="text-red-500 text-sm">{errors.category}</p>
+                    )}
                   </div>
 
                   <div>
@@ -458,6 +545,12 @@ const TransactionModal = ({ isOpen, onClose }) => {
                 }
                 className="w-full p-2 border rounded-md"
               />
+              {errors.payee && (
+                <p className="text-red-500 text-sm">{errors.payee}</p>
+              )}
+              {errors.payer && (
+                <p className="text-red-500 text-sm">{errors.payer}</p>
+              )}
             </div>
 
             {/* Note */}

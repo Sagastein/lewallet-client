@@ -32,7 +32,7 @@ function Layout() {
         </button>
         {/* Modal */}
         {isModalOpen && (
-          <TransactionModal onClose={closeModal} isOpen={openModal} />
+          <TransactionModal onClose={closeModal} isOpen={isModalOpen} />
         )}
       </section>
     </main>
